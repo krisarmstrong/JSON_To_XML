@@ -1,56 +1,51 @@
 #!/usr/bin/env python3
 """
-Project Title: JsonToXmlConverterTests
-
-Pytest smoke tests for json_to_xml.py functionality.
-
-Author: Kris Armstrong
+Tests for JsonToXmlConverter.
 """
-__version__ = "1.0.0"
-
+import json
+import os
 import pytest
-import subprocess
+from json_to_xml import __version__, convert_json_to_xml
 from pathlib import Path
-import json_to_xml
 
 @pytest.fixture
-def temp_dir(tmp_path: Path) -> Path:
-    """Create a temporary directory for testing.
+def json_xml_files(tmp_path):
+    """Create temporary JSON and XML files for testing."""
+    input_path = tmp_path / "input.json"
+    output_path = tmp_path / "output.xml"
+    data = {"root": {"key": "value", "nested": {"a": 1, "b": 2}}}
+    with open(input_path, "w", encoding="utf-8") as f:
+        json.dump(data, f)
+    return input_path, output_path
 
-    Args:
-        tmp_path: Pytest-provided temporary path.
+def test_version() -> None:
+    """Test version format."""
+    assert __version__ == "1.0.1"
 
-    Returns:
-        Path to temporary directory.
-    """
-    return tmp_path
+def test_convert_json_to_xml(json_xml_files) -> None:
+    """Test converting a JSON file to XML."""
+    input_path, output_path = json_xml_files
+    convert_json_to_xml(input_path, output_path)
 
-def test_convert_json_to_xml(temp_dir: Path) -> None:
-    """Test JSON to XML conversion."""
-    input_file = temp_dir / "test.json"
-    output_file = temp_dir / "test.xml"
-    input_file.write_text('{"key": "value"}')
-    result = json_to_xml.convert_json_to_xml(input_file, output_file)
-    assert result is True
-    assert output_file.exists()
+    with open(output_path, "r", encoding="utf-8") as f:
+        xml_content = f.read()
+    assert '<?xml version="1.0" encoding="utf-8"?>' in xml_content
+    assert "<root>" in xml_content
+    assert "<key>value</key>" in xml_content
+    assert "<nested>" in xml_content
+    assert "<a>1</a>" in xml_content
+    assert "<b>2</b>" in xml_content
 
-def test_keyboard_interrupt(temp_dir: Path, caplog: pytest.LogCaptureFixture) -> None:
-    """Test KeyboardInterrupt handling.
+def test_convert_json_to_xml_invalid_json(tmp_path) -> None:
+    """Test converting an invalid JSON file."""
+    input_path = tmp_path / "invalid.json"
+    output_path = tmp_path / "output.xml"
+    with open(input_path, "w", encoding="utf-8") as f:
+        f.write("{invalid json}")
+    with pytest.raises(json.JSONDecodeError):
+        convert_json_to_xml(input_path, output_path)
 
-    Args:
-        temp_dir: Temporary directory for testing.
-        caplog: Pytest fixture to capture log output.
-    """
-    with pytest.raises(SystemExit) as exc:
-        json_to_xml.setup_logging(False)
-        raise KeyboardInterrupt
-    assert exc.value.code == 0
-    assert "Cancelled by user" in caplog.text
-
-def test_version_bumper_generation(temp_dir: Path) -> None:
-    """Test version_bumper.py generation."""
-    from git_setup import VERSION_BUMPER_TEMPLATE, create_file
-    create_file(temp_dir / 'version_bumper.py', VERSION_BUMPER_TEMPLATE)
-    assert (temp_dir / 'version_bumper.py').exists()
-    result = subprocess.run(['python', 'version_bumper.py', '--help'], cwd=temp_dir, capture_output=True, text=True)
-    assert result.returncode == 0
+def test_convert_json_to_xml_invalid_file() -> None:
+    """Test converting a non-existent JSON file."""
+    with pytest.raises(IOError):
+        convert_json_to_xml(Path("nonexistent.json"), Path("output.xml"))

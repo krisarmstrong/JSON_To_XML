@@ -1,38 +1,54 @@
 # JsonToXmlConverter
 
-A Python tool to convert JSON files to XML using the xmltodict library.
-
-Designed for users needing to transform JSON data into XML for interoperability or data exchange.
+Converts JSON files to XML using the xmltodict library.
 
 ## Installation
 
 ```bash
+git clone https://github.com/krisarmstrong/json-to-xml-converter
+cd json-to-xml-converter
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-chmod +x json_to_xml.py
 ```
 
 ## Usage
 
-### json_to_xml.py
-
 ```bash
-./json_to_xml.py [--input_file discovery.json] [--output_file discovery.xml] [--verbose] [--logfile path]
+python json_to_xml.py --input_file discovery.json --output_file discovery.xml --verbose
 ```
 
-### version_bumper.py
+- `--input_file`: Input JSON file (default: discovery.json).
+- `--output_file`: Output XML file (default: discovery.xml).
+- `--verbose`: Enable verbose logging.
+- `--logfile`: Log file path (default: json_to_xml.log).
+
+## Files
+
+- `json_to_xml.py`: Main script.
+- `version_bumper.py`: Version management tool.
+- `tests/test_json_to_xml.py`: Pytest suite.
+- `requirements.txt`: Dependencies.
+- `CHANGELOG.md`: Version history.
+- `LICENSE`: MIT License.
+- `CONTRIBUTING.md`: Contribution guidelines.
+- `CODE_OF_CONDUCT.md`: Contributor Covenant.
+
+## GitHub Setup
 
 ```bash
-python version_bumper.py --project /path/to/project [--type minor] [--commit] [--git_tag] [--dry_run]
+gh repo create json-to-xml-converter --public --source=. --remote=origin
+git init
+git add .
+git commit -m "Initial commit: JsonToXmlConverter v1.0.1"
+git tag v1.0.1
+git push origin main --tags
 ```
 
-## Generated Files (via git_setup.py)
+## Contributing
 
-- **.gitignore**: Ignores Python, IDE, OS, and project-specific files (e.g., `__pycache__`, `.venv`, `tests/output/`).
-- **README.md**: Project template with customizable title, installation, and usage.
-- **CHANGELOG.md**: Initial changelog with a 0.1.0 entry, customizable author.
-- **requirements.txt**: Placeholder for dependencies.
-- **LICENSE**: MIT license with customizable author.
-- **CONTRIBUTING.md**: Fork-branch-PR guidelines.
-- **CODE_OF_CONDUCT.md**: Contributor Covenant with contact info.
-- **tests/**: Directory with a placeholder test file.
-- **version_bumper.py** (optional): Tool for bumping semantic versions.
+See CONTRIBUTING.md for details.
+
+## License
+
+MIT License. See LICENSE for details.

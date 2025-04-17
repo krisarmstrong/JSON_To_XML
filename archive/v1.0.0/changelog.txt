@@ -1,0 +1,16 @@
+# JSON to XML Converter Changelog
+
+## Version 1.0.0 (April 18, 2025)
+
+- Initial release of the JSON to XML Converter script.
+- Converts JSON files to XML using the xmltodict library.
+- Uses argparse for command-line argument parsing (input/output file paths).
+- Adds logging to json_to_xml.log with verbose console option.
+- Includes Config class for global constants (log file, encoding, default files).
+- Uses pathlib for cross-platform file handling.
+- Ensures PEP 8 compliance with Google-style docstrings and snake_case.
+- Handles file I/O and JSON parsing errors gracefully.
+- Sets up Git repository with .gitignore, bump_version.py, and requirements.txt.
+- Adds README.md and changelog.txt for documentation.
+- Archives original scripts (main.py, json2xml.py) in archive/v1.0.0/.
+- Requires xmltodict as the only third-party dependency.

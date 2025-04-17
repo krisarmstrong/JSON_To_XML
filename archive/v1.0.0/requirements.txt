@@ -1,0 +1,3 @@
+# JSON to XML Converter Dependencies
+
+xmltodict&gt;=0.13.0

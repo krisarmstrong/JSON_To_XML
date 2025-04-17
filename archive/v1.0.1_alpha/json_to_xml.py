@@ -8,6 +8,8 @@ Designed for users needing to transform JSON data into XML for interoperability 
 
 Author: Kris Armstrong
 """
+__version__ = "1.0.2"
+
 import argparse
 import logging
 from logging.handlers import RotatingFileHandler
@@ -16,8 +18,6 @@ from pathlib import Path
 from typing import Optional
 import xmltodict
 import json
-
-__version__ = "1.0.2"
 
 class Config:
     """Global configuration constants for JsonToXmlConverter."""
@@ -33,8 +33,8 @@ def setup_logging(verbose: bool, logfile: Optional[str] = None) -> None:
         verbose: Enable DEBUG level logging to console if True.
         logfile: Path to log file, defaults to Config.LOG_FILE if unspecified.
 
-    Raises:
-        PermissionError: If log file cannot be written.
+    Returns:
+        None
     """
     logger = logging.getLogger()
     level = logging.DEBUG if verbose else logging.INFO
@@ -93,8 +93,6 @@ def parse_arguments() -> argparse.Namespace:
         parser.error(f"Input file does not exist: {args.input_file}")
     if input_path.suffix.lower() != ".json":
         parser.error(f"Input file must be a JSON file: {args.input_file}")
-    if not args.output_file.lower().endswith(".xml"):
-        parser.error(f"Output file must be an XML file: {args.output_file}")
 
     return args
 
@@ -135,12 +133,8 @@ def convert_json_to_xml(input_path: Path, output_path: Path) -> bool:
         logging.error("File operation failed: %s", err)
         raise
 
-def main() -> int:
-    """Convert JSON to XML and handle errors.
-
-    Returns:
-        Exit code (0 for success, 1 for error).
-    """
+def main() -> None:
+    """Convert JSON to XML and handle errors."""
     try:
         args = parse_arguments()
         setup_logging(args.verbose, args.logfile)
@@ -150,14 +144,22 @@ def main() -> int:
         if convert_json_to_xml(input_path, output_path):
             print(f"{input_path} has been converted to {output_path}")
             logging.info("Conversion completed successfully")
-        return 0
+        sys.exit(0)
+    except json.JSONDecodeError as err:
+        print(f"Error: Invalid JSON in {input_path}: {err}")
+        logging.error("Conversion failed: %s", err)
+        sys.exit(1)
+    except IOError as err:
+        print(f"Error: File operation failed: {err}")
+        logging.error("Conversion failed: %s", err)
+        sys.exit(1)
     except KeyboardInterrupt:
         logging.info("Cancelled by user")
-        return 0
+        sys.exit(0)
     except Exception as err:
-        logging.error("Error: %s", err)
-        print(f"Error: {err}")
-        return 1
+        print(f"Unexpected error: {err}")
+        logging.error("Unexpected error: %s", err)
+        sys.exit(1)
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
